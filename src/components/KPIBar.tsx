@@ -7,8 +7,15 @@ import {
   MessageSquare, Trophy,
 } from "lucide-react";
 import { PixelCanvas } from "@/components/ui/pixel-canvas";
-import { MOCK_KPI } from "@/lib/mockData";
 import { cn } from "@/lib/utils";
+
+interface KPIData {
+  totalApps: number;
+  activeApps: number;
+  maintenanceApps: number;
+  totalReportsThisMonth: number;
+  mostPopularApp: { id: string; name: string; totalRatings: number } | null;
+}
 
 // ─── Count-up hook ────────────────────────────────────────────────────────────
 function useCountUp(target: number, duration = 1200) {
@@ -100,9 +107,8 @@ function NumCard({ icon, label, value, accentClass, pixelColors, className }: Nu
 }
 
 // ─── Most Popular card ────────────────────────────────────────────────────────
-function PopularCard() {
-  const { mostPopularApp } = MOCK_KPI;
-  const count = useCountUp(mostPopularApp.totalRatings);
+function PopularCard({ app }: { app: KPIData["mostPopularApp"] }) {
+  const count = useCountUp(app?.totalRatings ?? 0);
 
   return (
     <div className="relative flex-1 min-w-[180px] rounded-xl overflow-hidden p-[2px] bg-gradient-to-br from-neutral-800 via-neutral-900 to-black">
@@ -148,7 +154,7 @@ function PopularCard() {
             className="text-foundry-white leading-tight mb-1 line-clamp-2"
             style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "17px", letterSpacing: "0.02em" }}
           >
-            {mostPopularApp.name}
+            {app?.name ?? "—"}
           </div>
           <div className="flex items-baseline gap-1.5">
             <motion.span
@@ -180,6 +186,16 @@ function PopularCard() {
 
 // ─── KPIBar ──────────────────────────────────────────────────────────────────
 export default function KPIBar() {
+  const [kpi, setKpi] = useState<KPIData | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then(setKpi);
+  }, []);
+
+  const data = kpi ?? { totalApps: 0, activeApps: 0, maintenanceApps: 0, totalReportsThisMonth: 0, mostPopularApp: null };
+
   return (
     <section className="relative z-[1] bg-foundry-dark border-y border-foundry-border">
       <div className="max-w-7xl mx-auto px-6 py-8">
@@ -187,32 +203,32 @@ export default function KPIBar() {
           <NumCard
             icon={<Grid3X3 className="w-3.5 h-3.5" />}
             label="Total Aplikasi"
-            value={MOCK_KPI.totalApps}
+            value={data.totalApps}
             accentClass="bg-foundry-border"
             pixelColors={["#2E3A55", "#3D4E6B", "#607089"]}
           />
           <NumCard
             icon={<CheckCircle2 className="w-3.5 h-3.5 text-active" />}
             label="Aktif"
-            value={MOCK_KPI.activeApps}
+            value={data.activeApps}
             accentClass="bg-active"
             pixelColors={["#14532d", "#166534", "#22c55e"]}
           />
           <NumCard
             icon={<AlertTriangle className="w-3.5 h-3.5 text-maintenance" />}
             label="Maintenance"
-            value={MOCK_KPI.maintenanceApps}
+            value={data.maintenanceApps}
             accentClass="bg-maintenance"
             pixelColors={["#78350f", "#92400e", "#f59e0b"]}
           />
           <NumCard
             icon={<MessageSquare className="w-3.5 h-3.5 text-molten" />}
             label="Laporan Bulan Ini"
-            value={MOCK_KPI.totalReportsThisMonth}
+            value={data.totalReportsThisMonth}
             accentClass="bg-molten"
             pixelColors={["#7c2d12", "#c2410c", "#FF6B2B"]}
           />
-          <PopularCard />
+          <PopularCard app={data.mostPopularApp} />
         </div>
       </div>
     </section>
