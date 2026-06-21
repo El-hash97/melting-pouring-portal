@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, Heart } from "lucide-react";
 
 const navigation = [
   {
@@ -45,29 +44,9 @@ const navigation = [
 export default function Footer() {
   return (
     <footer className="relative z-[1] border-t border-foundry-border/40 bg-black">
-      {/* Logo + description */}
-      <div className="relative mx-auto grid max-w-7xl items-center justify-center gap-6 p-10 pb-0 md:flex">
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="relative w-8 h-8 flex items-center justify-center">
-            <div className="absolute inset-0 bg-molten/15 rounded-sm rotate-45" />
-            <Zap className="relative z-10 w-4 h-4 text-molten" strokeWidth={2.5} />
-          </div>
-          <div>
-            <div
-              className="text-foundry-white"
-              style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "14px", letterSpacing: "0.1em" }}
-            >
-              CASTING APP PORTAL
-            </div>
-            <div
-              className="text-foundry-muted"
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px", letterSpacing: "0.08em" }}
-            >
-              PT TOYOTA MANUFACTURING INDONESIA
-            </div>
-          </div>
-        </div>
-        <p className="text-center text-xs leading-5 text-foundry-muted/80 md:text-left max-w-xl">
+      {/* Description */}
+      <div className="relative mx-auto max-w-7xl px-10 pt-10 pb-0">
+        <p className="text-xs leading-5 text-foundry-muted/80 max-w-xl">
           Portal terpusat untuk akses, monitoring, dan feedback seluruh aplikasi digital area Melting &amp; Pouring PT Toyota Manufacturing Indonesia. Dirancang untuk meningkatkan efisiensi operasional dan kualitas proses produksi casting.
         </p>
       </div>
@@ -103,21 +82,18 @@ export default function Footer() {
       </div>
 
       {/* Copyright */}
-      <div className="mx-auto mb-10 mt-2 flex flex-col items-center text-center text-xs md:max-w-7xl">
+      <div className="mx-auto px-6 py-6 flex flex-col items-center text-center text-xs md:max-w-7xl">
         <div className="flex flex-row items-center gap-1.5 text-foundry-muted">
           <span>©</span>
           <span>{new Date().getFullYear()}</span>
-          <span>Dibuat dengan</span>
-          <Heart className="text-molten h-3.5 w-3.5 animate-pulse fill-current" />
-          <span>oleh</span>
           <span
             className="text-foundry-white"
             style={{ fontFamily: "'JetBrains Mono', monospace" }}
           >
-            Tim Digital TMI
+            Melting &amp; Pouring Line
           </span>
           <span>—</span>
-          <span>Internal Use Only</span>
+          <span>Divisi Casting</span>
         </div>
       </div>
     </footer>

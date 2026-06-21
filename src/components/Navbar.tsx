@@ -1,17 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Settings, Zap } from "lucide-react";
+import { Settings } from "lucide-react";
+import Image from "next/image";
 import clsx from "clsx";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const timeStr = now
+    ? now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })
+    : "--:--:--";
+  const dateStr = now
+    ? now.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" })
+    : "-- --- ----";
 
   return (
     <nav
@@ -23,10 +38,17 @@ export default function Navbar() {
       )}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="relative w-8 h-8 flex items-center justify-center">
-            <div className="absolute inset-0 bg-molten/20 rounded-sm rotate-45" />
-            <Zap className="relative z-10 w-4 h-4 text-molten" strokeWidth={2.5} />
+          <div className="relative w-21 h-21 flex items-center justify-center flex-shrink-0">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={88}
+              height={88}
+              className="object-contain"
+              priority
+            />
           </div>
           <div>
             <div>
@@ -47,28 +69,37 @@ export default function Navbar() {
               className="text-foundry-muted leading-none mt-0.5"
               style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px", letterSpacing: "0.12em" }}
             >
-              TMI MELTING & POURING
+              MELTING - POURING LINE
             </div>
           </div>
         </div>
 
+        {/* Right side */}
         <div className="flex items-center gap-4">
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-active animate-pulse" />
+          {/* Real-time clock */}
+          <div className="hidden sm:flex flex-col items-end">
             <span
-              className="text-foundry-muted"
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", letterSpacing: "0.08em" }}
+              className="text-foundry-white tabular-nums leading-none"
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", letterSpacing: "0.06em" }}
             >
-              SYSTEM ONLINE
+              {timeStr}
+            </span>
+            <span
+              className="text-foundry-muted leading-none mt-0.5"
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px", letterSpacing: "0.08em" }}
+            >
+              {dateStr}
             </span>
           </div>
+
+          {/* Admin — icon only, no box */}
           <a
             href="/admin/login"
-            className="flex items-center gap-2 px-3 py-1.5 border border-foundry-border text-foundry-muted hover:border-molten hover:text-molten transition-all duration-200"
-            style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 600, fontSize: "13px", letterSpacing: "0.08em" }}
+            className="text-foundry-muted hover:text-molten transition-colors p-1.5"
+            title="Admin Panel"
+            aria-label="Admin Panel"
           >
-            <Settings className="w-3.5 h-3.5" />
-            ADMIN
+            <Settings className="w-4 h-4" />
           </a>
         </div>
       </div>
