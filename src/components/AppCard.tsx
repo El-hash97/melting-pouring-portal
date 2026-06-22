@@ -2,24 +2,14 @@
 
 import { useState } from "react";
 import {
-  Flame, Activity, Lightbulb, Thermometer,
-  BarChart2, ShieldAlert, Star, ExternalLink,
+  Flame, Star, ExternalLink,
   MessageSquarePlus, AlertTriangle, CheckCircle2,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AppItem } from "@/lib/mockData";
 import { GridPattern, genSeededPattern } from "@/components/ui/grid-feature-cards";
 import FeedbackModal from "@/components/FeedbackModal";
-
-const ICON_MAP: Record<string, LucideIcon> = {
-  flame: Flame,
-  activity: Activity,
-  lightbulb: Lightbulb,
-  thermometer: Thermometer,
-  "bar-chart-2": BarChart2,
-  "shield-alert": ShieldAlert,
-};
+import { ICON_MAP } from "@/lib/iconMap";
 
 interface Props {
   app: AppItem;

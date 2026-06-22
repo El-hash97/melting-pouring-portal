@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Zap, Grid3X3, LayoutGrid, MessageSquare, LogOut } from "lucide-react";
+import { Zap, Grid3X3, LayoutGrid, MessageSquare, LogOut, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", icon: Grid3X3, exact: true },
   { href: "/admin/apps", label: "Kelola Aplikasi", icon: LayoutGrid, exact: false },
   { href: "/admin/feedbacks", label: "Feedback Inbox", icon: MessageSquare, exact: false },
+  { href: "/admin/categories", label: "Kategori & Icon", icon: Tag, exact: false },
 ];
 
 export default function AdminSidebar({ username, onLogout }: Props) {

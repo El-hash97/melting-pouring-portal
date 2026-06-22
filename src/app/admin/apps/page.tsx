@@ -3,11 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Plus, Pencil, Trash2, CheckCircle2, AlertTriangle, X, Save,
+  Plus, Pencil, Trash2, CheckCircle2, AlertTriangle, X, Save, Flame,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import AdminSidebar from "@/components/AdminSidebar";
+import { ICON_MAP, DEFAULT_ICONS } from "@/lib/iconMap";
 
 interface App {
   id: string;
@@ -31,24 +32,35 @@ interface AppForm {
 
 const EMPTY_FORM: AppForm = {
   name: "", description: "", logoIcon: "flame",
-  accessLink: "", status: "ACTIVE", category: "General",
+  accessLink: "", status: "ACTIVE", category: "",
 };
-
-const LOGO_OPTIONS = ["flame","activity","lightbulb","thermometer","bar-chart-2","shield-alert","layers","cpu","database","zap"];
-const CATEGORY_OPTIONS = ["Pouring","Monitoring","Improvement","Quality","Production","General"];
 
 export default function AdminAppsPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [apps, setApps] = useState<App[]>([]);
-  const [showForm, setShowForm] = useState(false);
+  const [username, setUsername]   = useState("");
+  const [apps, setApps]           = useState<App[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [customIconNames, setCustomIconNames] = useState<string[]>([]);
+  const [showForm, setShowForm]   = useState(false);
   const [editingApp, setEditingApp] = useState<App | null>(null);
-  const [form, setForm] = useState<AppForm>(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
+  const [form, setForm]           = useState<AppForm>(EMPTY_FORM);
+  const [saving, setSaving]       = useState(false);
 
   const fetchApps = useCallback(async () => {
     const r = await fetch("/api/apps");
     if (r.ok) setApps(await r.json());
+  }, []);
+
+  const fetchMeta = useCallback(async () => {
+    const [cRes, iRes] = await Promise.all([fetch("/api/categories"), fetch("/api/icons")]);
+    if (cRes.ok) {
+      const cats: { name: string }[] = await cRes.json();
+      setCategories(cats.map((c) => c.name));
+    }
+    if (iRes.ok) {
+      const icons: { name: string }[] = await iRes.json();
+      setCustomIconNames(icons.map((i) => i.name));
+    }
   }, []);
 
   useEffect(() => {
@@ -57,14 +69,19 @@ export default function AdminAppsPage() {
       return r.json();
     }).then((d) => d && setUsername(d.username));
     fetchApps();
-  }, [router, fetchApps]);
+    fetchMeta();
+  }, [router, fetchApps, fetchMeta]);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
   };
 
-  const openCreate = () => { setEditingApp(null); setForm(EMPTY_FORM); setShowForm(true); };
+  const openCreate = () => {
+    setEditingApp(null);
+    setForm({ ...EMPTY_FORM, category: categories[0] ?? "" });
+    setShowForm(true);
+  };
   const openEdit = (app: App) => {
     setEditingApp(app);
     setForm({ name: app.name, description: app.description, logoIcon: app.logoIcon, accessLink: app.accessLink, status: app.status, category: app.category });
@@ -96,6 +113,9 @@ export default function AdminAppsPage() {
     fetchApps();
   };
 
+  const allIconNames = Array.from(new Set([...DEFAULT_ICONS, ...customIconNames]));
+  const SelectedIcon = ICON_MAP[form.logoIcon] ?? Flame;
+
   return (
     <div className="min-h-screen bg-foundry-black flex">
       <AdminSidebar username={username} onLogout={handleLogout} />
@@ -107,16 +127,10 @@ export default function AdminAppsPage() {
           <div className="absolute top-0 right-8 w-16 h-16 border-r-2 border-t-2 border-molten/15 pointer-events-none" />
           <div className="relative flex items-end justify-between">
             <div>
-              <div
-                className="text-molten uppercase tracking-widest mb-1"
-                style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}
-              >
+              <div className="text-molten uppercase tracking-widest mb-1" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}>
                 Manajemen
               </div>
-              <h1
-                className="text-foundry-white"
-                style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "28px" }}
-              >
+              <h1 className="text-foundry-white" style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "28px" }}>
                 KELOLA APLIKASI
               </h1>
             </div>
@@ -142,11 +156,7 @@ export default function AdminAppsPage() {
               <thead>
                 <tr className="border-b border-foundry-border bg-foundry-dark">
                   {["Nama", "Kategori", "Status", "Rating", "Aksi"].map((h) => (
-                    <th
-                      key={h}
-                      className="text-left px-4 py-3 text-foundry-muted uppercase tracking-widest"
-                      style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}
-                    >
+                    <th key={h} className="text-left px-4 py-3 text-foundry-muted uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>
                       {h}
                     </th>
                   ))}
@@ -162,25 +172,10 @@ export default function AdminAppsPage() {
                     className="border-b border-foundry-border/50 hover:bg-foundry-steel/20 transition-colors"
                   >
                     <td className="px-4 py-3">
-                      <div
-                        className="text-foundry-white font-medium"
-                        style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "15px" }}
-                      >
-                        {app.name}
-                      </div>
-                      <div
-                        className="text-foundry-muted truncate max-w-[240px]"
-                        style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}
-                      >
-                        {app.accessLink}
-                      </div>
+                      <div className="text-foundry-white font-medium" style={{ fontFamily: "'Rajdhani', sans-serif", fontSize: "15px" }}>{app.name}</div>
+                      <div className="text-foundry-muted truncate max-w-[240px]" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}>{app.accessLink}</div>
                     </td>
-                    <td
-                      className="px-4 py-3 text-foundry-muted"
-                      style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px" }}
-                    >
-                      {app.category}
-                    </td>
+                    <td className="px-4 py-3 text-foundry-muted" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px" }}>{app.category}</td>
                     <td className="px-4 py-3">
                       <button
                         onClick={() => toggleStatus(app)}
@@ -198,10 +193,7 @@ export default function AdminAppsPage() {
                           : <><AlertTriangle className="w-3 h-3" /> MAINTENANCE</>}
                       </button>
                     </td>
-                    <td
-                      className="px-4 py-3 text-foundry-muted"
-                      style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px" }}
-                    >
+                    <td className="px-4 py-3 text-foundry-muted" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px" }}>
                       {app.averageRating ? app.averageRating.toFixed(1) : "—"}
                     </td>
                     <td className="px-4 py-3">
@@ -264,9 +256,7 @@ export default function AdminAppsPage() {
                 { id: "accessLink" as const, label: "URL Aplikasi" },
               ]).map(({ id, label }) => (
                 <div key={id}>
-                  <label className="block text-foundry-muted uppercase tracking-widest mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>
-                    {label}
-                  </label>
+                  <label className="block text-foundry-muted uppercase tracking-widest mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>{label}</label>
                   <input
                     type="text"
                     value={form[id]}
@@ -290,25 +280,60 @@ export default function AdminAppsPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {([
-                  { id: "category" as const, label: "Kategori", options: CATEGORY_OPTIONS },
-                  { id: "logoIcon" as const, label: "Icon", options: LOGO_OPTIONS },
-                ]).map(({ id, label, options }) => (
-                  <div key={id}>
-                    <label className="block text-foundry-muted uppercase tracking-widest mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>{label}</label>
-                    <select
-                      value={form[id]}
-                      onChange={(e) => setForm((f) => ({ ...f, [id]: e.target.value }))}
-                      className="w-full bg-foundry-steel border border-foundry-border text-foundry-white px-3 py-2 focus:outline-none focus:border-molten transition-colors"
-                      style={{ fontFamily: "'Inter', sans-serif", fontSize: "13px" }}
-                    >
-                      {options.map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
+              {/* Category dropdown */}
+              <div>
+                <label className="block text-foundry-muted uppercase tracking-widest mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>Kategori</label>
+                {categories.length > 0 ? (
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+                    className="w-full bg-foundry-steel border border-foundry-border text-foundry-white px-3 py-2 focus:outline-none focus:border-molten transition-colors"
+                    style={{ fontFamily: "'Inter', sans-serif", fontSize: "13px" }}
+                  >
+                    {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-foundry-steel border border-foundry-border text-foundry-muted" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}>
+                    Belum ada kategori — tambahkan di halaman{" "}
+                    <a href="/admin/categories" className="text-molten underline">Kategori & Icon</a>
                   </div>
-                ))}
+                )}
               </div>
 
+              {/* Icon visual picker */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-foundry-muted uppercase tracking-widest" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>Icon</label>
+                  <div className="flex items-center gap-1.5">
+                    <SelectedIcon className="w-4 h-4 text-molten" />
+                    <span className="text-molten" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>{form.logoIcon}</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-8 gap-1.5 bg-foundry-steel border border-foundry-border p-2 max-h-36 overflow-y-auto">
+                  {allIconNames.map((name) => {
+                    const Icon = ICON_MAP[name] ?? Flame;
+                    const isSelected = form.logoIcon === name;
+                    return (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, logoIcon: name }))}
+                        title={name}
+                        className={cn(
+                          "flex items-center justify-center p-2 border transition-all",
+                          isSelected
+                            ? "border-molten bg-molten/20 text-molten"
+                            : "border-transparent hover:border-foundry-border text-foundry-muted hover:text-foundry-white"
+                        )}
+                      >
+                        <Icon className="w-4 h-4" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Status */}
               <div>
                 <label className="block text-foundry-muted uppercase tracking-widest mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "9px" }}>Status</label>
                 <div className="flex gap-3">

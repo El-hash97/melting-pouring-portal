@@ -43,6 +43,22 @@ model User {
   @@map("users")
 }
 
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("categories")
+}
+
+model IconOption {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  @@map("icon_options")
+}
+
 enum AppStatus {
   ACTIVE
   MAINTENANCE

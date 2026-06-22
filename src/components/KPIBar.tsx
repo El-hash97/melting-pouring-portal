@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import {
   Grid3X3, CheckCircle2, AlertTriangle,
-  MessageSquare, Trophy,
+  MessageSquare, Trophy, ArrowUpRight,
 } from "lucide-react";
-import { PixelCanvas } from "@/components/ui/pixel-canvas";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 interface KPIData {
@@ -39,70 +38,32 @@ interface NumCardProps {
   icon: React.ReactNode;
   label: string;
   value: number;
-  accentClass: string;
-  pixelColors: string[];
-  className?: string;
+  valueClass: string;
+  subtitle?: string;
+  subtitleClass?: string;
 }
 
-function NumCard({ icon, label, value, accentClass, pixelColors, className }: NumCardProps) {
+function NumCard({ icon, label, value, valueClass, subtitle, subtitleClass }: NumCardProps) {
   const count = useCountUp(value);
 
   return (
-    <div
-      className={cn(
-        "relative flex-1 min-w-[130px] rounded-xl overflow-hidden p-[2px] bg-gradient-to-br from-neutral-800 via-neutral-900 to-black",
-        className
-      )}
-    >
-      {/* Inner Card */}
-      <div className="relative flex flex-col gap-3 p-5 w-full h-full rounded-xl border border-white/10 bg-gradient-to-br from-neutral-900/80 to-black/60 backdrop-blur-md overflow-hidden cursor-default">
-
-        {/* Pixel canvas — unchanged from original */}
-        <PixelCanvas colors={pixelColors} gap={6} speed={28} noFocus />
-
-        {/* Top accent line */}
-        <div className={cn("absolute top-0 left-0 right-0 h-0.5 z-10", accentClass)} />
-
-        {/* Subtle horizontal lines from StatCard */}
-        <motion.div
-          className="absolute top-[12%] w-[80%] h-[1px] bg-gradient-to-r from-white/20 to-transparent"
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-[12%] w-[80%] h-[1px] bg-gradient-to-r from-transparent to-white/20"
-          animate={{ opacity: [1, 0.4, 1] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-
-        {/* Label row */}
-        <div className="relative z-10 flex items-center gap-2 text-foundry-muted">
-          {icon}
-          <span
-            className="uppercase tracking-widest"
-            style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}
-          >
-            {label}
-          </span>
-        </div>
-
-        {/* Value with glow animation */}
-        <motion.div
-          className="relative z-10 font-extrabold bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent leading-none"
-          style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "38px" }}
-          animate={{
-            textShadow: [
-              "0 0 10px rgba(255,255,255,0.6)",
-              "0 0 2px rgba(255,255,255,0.2)",
-              "0 0 10px rgba(255,255,255,0.6)",
-            ],
-          }}
-          transition={{ duration: 4, repeat: Infinity }}
-        >
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle>{label}</CardTitle>
+        {icon}
+      </CardHeader>
+      <CardContent>
+        <div className={cn("text-2xl font-bold font-mono", valueClass)}>
           {count}
-        </motion.div>
-      </div>
-    </div>
+        </div>
+        {subtitle && (
+          <div className={cn("flex items-center pt-1 text-xs", subtitleClass)}>
+            <ArrowUpRight className="mr-1 h-3 w-3" />
+            <span>{subtitle}</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -111,76 +72,22 @@ function PopularCard({ app }: { app: KPIData["mostPopularApp"] }) {
   const count = useCountUp(app?.totalRatings ?? 0);
 
   return (
-    <div className="relative flex-1 min-w-[180px] rounded-xl overflow-hidden p-[2px] bg-gradient-to-br from-neutral-800 via-neutral-900 to-black">
-      {/* Inner Card */}
-      <div className="relative flex flex-col gap-3 p-5 w-full h-full rounded-xl border border-white/10 bg-gradient-to-br from-neutral-900/80 to-black/60 backdrop-blur-md overflow-hidden cursor-default">
-
-        <PixelCanvas
-          colors={["#3b0764", "#6d28d9", "#a78bfa"]}
-          gap={6}
-          speed={28}
-          noFocus
-        />
-
-        {/* Purple top accent */}
-        <div className="absolute top-0 left-0 right-0 h-0.5 z-10 bg-purple-500" />
-
-        {/* Subtle lines */}
-        <motion.div
-          className="absolute top-[12%] w-[80%] h-[1px] bg-gradient-to-r from-white/20 to-transparent"
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-        <motion.div
-          className="absolute bottom-[12%] w-[80%] h-[1px] bg-gradient-to-r from-transparent to-white/20"
-          animate={{ opacity: [1, 0.4, 1] }}
-          transition={{ duration: 6, repeat: Infinity }}
-        />
-
-        {/* Label row */}
-        <div className="relative z-10 flex items-center gap-2 text-foundry-muted">
-          <Trophy className="w-3.5 h-3.5 text-purple-400" />
-          <span
-            className="uppercase tracking-widest"
-            style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}
-          >
-            Terpopuler
-          </span>
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle>Terpopuler</CardTitle>
+        <Trophy className="h-4 w-4 text-purple-400" />
+      </CardHeader>
+      <CardContent>
+        <div className="text-base font-bold text-foundry-white truncate mb-1">
+          {app?.name ?? "—"}
         </div>
-
-        {/* App name + count */}
-        <div className="relative z-10 flex-1">
-          <div
-            className="text-foundry-white leading-tight mb-1 line-clamp-2"
-            style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "17px", letterSpacing: "0.02em" }}
-          >
-            {app?.name ?? "—"}
-          </div>
-          <div className="flex items-baseline gap-1.5">
-            <motion.span
-              className="text-purple-400 font-extrabold"
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "22px" }}
-              animate={{
-                textShadow: [
-                  "0 0 8px rgba(167,139,250,0.7)",
-                  "0 0 2px rgba(167,139,250,0.2)",
-                  "0 0 8px rgba(167,139,250,0.7)",
-                ],
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-            >
-              {count}
-            </motion.span>
-            <span
-              className="text-foundry-muted"
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}
-            >
-              pengguna aktif
-            </span>
-          </div>
+        <div className="flex items-center pt-1 text-xs text-purple-400">
+          <ArrowUpRight className="mr-1 h-3 w-3" />
+          <span className="font-mono font-bold">{count}</span>
+          <span className="ml-1 text-foundry-muted">pengguna aktif</span>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -194,39 +101,47 @@ export default function KPIBar() {
       .then(setKpi);
   }, []);
 
-  const data = kpi ?? { totalApps: 0, activeApps: 0, maintenanceApps: 0, totalReportsThisMonth: 0, mostPopularApp: null };
+  const data = kpi ?? {
+    totalApps: 0,
+    activeApps: 0,
+    maintenanceApps: 0,
+    totalReportsThisMonth: 0,
+    mostPopularApp: null,
+  };
 
   return (
     <section className="relative z-[1] bg-foundry-dark border-y border-foundry-border">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <NumCard
-            icon={<Grid3X3 className="w-3.5 h-3.5" />}
+            icon={<Grid3X3 className="h-4 w-4 text-foundry-muted" />}
             label="Total Aplikasi"
             value={data.totalApps}
-            accentClass="bg-foundry-border"
-            pixelColors={["#2E3A55", "#3D4E6B", "#607089"]}
+            valueClass="text-foundry-white"
           />
           <NumCard
-            icon={<CheckCircle2 className="w-3.5 h-3.5 text-active" />}
+            icon={<CheckCircle2 className="h-4 w-4 text-active" />}
             label="Aktif"
             value={data.activeApps}
-            accentClass="bg-active"
-            pixelColors={["#14532d", "#166534", "#22c55e"]}
+            valueClass="text-active"
+            subtitle="sedang berjalan"
+            subtitleClass="text-active/80"
           />
           <NumCard
-            icon={<AlertTriangle className="w-3.5 h-3.5 text-maintenance" />}
+            icon={<AlertTriangle className="h-4 w-4 text-maintenance" />}
             label="Maintenance"
             value={data.maintenanceApps}
-            accentClass="bg-maintenance"
-            pixelColors={["#78350f", "#92400e", "#f59e0b"]}
+            valueClass="text-maintenance"
+            subtitle="dalam perbaikan"
+            subtitleClass="text-maintenance/80"
           />
           <NumCard
-            icon={<MessageSquare className="w-3.5 h-3.5 text-molten" />}
+            icon={<MessageSquare className="h-4 w-4 text-molten" />}
             label="Laporan Bulan Ini"
             value={data.totalReportsThisMonth}
-            accentClass="bg-molten"
-            pixelColors={["#7c2d12", "#c2410c", "#FF6B2B"]}
+            valueClass="text-molten"
+            subtitle="laporan masuk"
+            subtitleClass="text-molten/80"
           />
           <PopularCard app={data.mostPopularApp} />
         </div>

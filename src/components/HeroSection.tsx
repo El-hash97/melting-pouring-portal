@@ -60,7 +60,7 @@ export default function HeroSection() {
         </h1>
 
         <p
-          className="fade-up delay-400 text-foundry-muted max-w-lg mx-auto mb-10 leading-relaxed"
+          className="fade-up delay-400 text-foundry-muted max-w-lg mx-auto mb-6 leading-relaxed"
           style={{ fontFamily: "'Inter', sans-serif", fontSize: "15px" }}
         >
           Satu pintu akses ke seluruh aplikasi produksi. Pantau status sistem,
@@ -75,12 +75,6 @@ export default function HeroSection() {
           >
             BUKA DIREKTORI APLIKASI
           </button>
-          <span
-            className="text-foundry-muted"
-            style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "11px" }}
-          >
-            6 tools tersedia ↓
-          </span>
         </div>
       </div>
 
