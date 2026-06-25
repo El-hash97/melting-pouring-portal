@@ -15,6 +15,7 @@ model Application {
   accessLink  String
   status      AppStatus   @default(ACTIVE)
   category    String      @default("General")
+  openCount   Int         @default(0)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   feedbacks   Feedback[]

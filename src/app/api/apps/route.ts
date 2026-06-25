@@ -24,6 +24,7 @@ export async function GET() {
       accessLink: app.accessLink,
       status: app.status,
       category: app.category,
+      openCount: app.openCount,
       averageRating,
       totalRatings: ratings.length,
       createdAt: app.createdAt,

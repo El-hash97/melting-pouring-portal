@@ -8,6 +8,7 @@ export interface AppItem {
   accessLink: string;
   status: AppStatus;
   category: string;
+  openCount: number;
   averageRating: number;
   totalRatings: number;
 }
@@ -30,6 +31,7 @@ export const MOCK_APPS: AppItem[] = [
     accessLink: "#",
     status: "ACTIVE",
     category: "Pouring",
+    openCount: 124,
     averageRating: 4.5,
     totalRatings: 32,
   },
@@ -42,6 +44,7 @@ export const MOCK_APPS: AppItem[] = [
     accessLink: "#",
     status: "ACTIVE",
     category: "Monitoring",
+    openCount: 87,
     averageRating: 4.2,
     totalRatings: 18,
   },
@@ -54,6 +57,7 @@ export const MOCK_APPS: AppItem[] = [
     accessLink: "#",
     status: "MAINTENANCE",
     category: "Improvement",
+    openCount: 203,
     averageRating: 3.8,
     totalRatings: 45,
   },
@@ -66,6 +70,7 @@ export const MOCK_APPS: AppItem[] = [
     accessLink: "#",
     status: "ACTIVE",
     category: "Quality",
+    openCount: 156,
     averageRating: 4.7,
     totalRatings: 28,
   },
@@ -78,6 +83,7 @@ export const MOCK_APPS: AppItem[] = [
     accessLink: "#",
     status: "ACTIVE",
     category: "Production",
+    openCount: 312,
     averageRating: 4.0,
     totalRatings: 56,
   },
@@ -90,6 +96,7 @@ export const MOCK_APPS: AppItem[] = [
     accessLink: "#",
     status: "ACTIVE",
     category: "Quality",
+    openCount: 198,
     averageRating: 4.3,
     totalRatings: 41,
   },

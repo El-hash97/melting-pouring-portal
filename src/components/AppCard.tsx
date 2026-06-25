@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Flame, Star, ExternalLink,
+  Flame, Star, ExternalLink, Eye,
   MessageSquarePlus, AlertTriangle, CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,9 +17,16 @@ interface Props {
 
 export default function AppCard({ app }: Props) {
   const [showModal, setShowModal] = useState(false);
+  const [opens, setOpens] = useState(app.openCount ?? 0);
   const Icon = ICON_MAP[app.logoIcon] ?? Flame;
   const isMaintenance = app.status === "MAINTENANCE";
   const pattern = genSeededPattern(parseInt(app.id, 10) * 31, 6);
+
+  // Catat satu "open" (fire-and-forget) lalu naikkan angka seketika.
+  function handleOpen() {
+    navigator.sendBeacon?.(`/api/apps/${app.id}/open`);
+    setOpens((c) => c + 1);
+  }
 
   return (
     <>
@@ -117,6 +124,15 @@ export default function AppCard({ app }: Props) {
             >
               {app.averageRating.toFixed(1)} ({app.totalRatings})
             </span>
+            <span className="text-foundry-border">·</span>
+            <span
+              className="flex items-center gap-1 text-foundry-muted"
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px" }}
+              title={`${opens.toLocaleString("id-ID")} kali dibuka`}
+            >
+              <Eye className="w-3 h-3" />
+              {opens.toLocaleString("id-ID")}
+            </span>
           </div>
 
           {/* Actions */}
@@ -133,7 +149,7 @@ export default function AppCard({ app }: Props) {
                   : "bg-molten text-foundry-black hover:bg-molten-bright"
               )}
               style={{ fontFamily: "'Rajdhani', sans-serif", fontWeight: 700, fontSize: "12px", letterSpacing: "0.1em" }}
-              onClick={isMaintenance ? (e) => e.preventDefault() : undefined}
+              onClick={isMaintenance ? (e) => e.preventDefault() : handleOpen}
             >
               <ExternalLink className="w-3 h-3" />
               {isMaintenance ? "DALAM PERBAIKAN" : "BUKA APLIKASI"}

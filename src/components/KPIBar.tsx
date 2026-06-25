@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Grid3X3, CheckCircle2, AlertTriangle,
-  MessageSquare, Trophy, ArrowUpRight,
+  MessageSquare, Trophy, ArrowUpRight, Eye,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ interface KPIData {
   activeApps: number;
   maintenanceApps: number;
   totalReportsThisMonth: number;
+  totalOpens: number;
   mostPopularApp: { id: string; name: string; totalRatings: number } | null;
 }
 
@@ -106,13 +107,14 @@ export default function KPIBar() {
     activeApps: 0,
     maintenanceApps: 0,
     totalReportsThisMonth: 0,
+    totalOpens: 0,
     mostPopularApp: null,
   };
 
   return (
     <section className="relative z-[1] bg-foundry-dark border-y border-foundry-border">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
           <NumCard
             icon={<Grid3X3 className="h-4 w-4 text-foundry-muted" />}
             label="Total Aplikasi"
@@ -142,6 +144,14 @@ export default function KPIBar() {
             valueClass="text-molten"
             subtitle="laporan masuk"
             subtitleClass="text-molten/80"
+          />
+          <NumCard
+            icon={<Eye className="h-4 w-4 text-active" />}
+            label="Total Dibuka"
+            value={data.totalOpens}
+            valueClass="text-foundry-white"
+            subtitle="akses aplikasi"
+            subtitleClass="text-active/80"
           />
           <PopularCard app={data.mostPopularApp} />
         </div>
