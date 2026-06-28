@@ -1,47 +1,40 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { AppItem } from "@/lib/mockData";
 
-const navigation = [
-  {
-    id: "pouring",
-    name: "Pouring",
-    items: [
-      { name: "Smart Pouring Log", href: "#" },
-      { name: "Mold Temp Tracker", href: "#" },
-      { name: "Trial Flow Monitor", href: "#" },
-    ],
-  },
-  {
-    id: "production",
-    name: "Production",
-    items: [
-      { name: "Production Counter", href: "#" },
-      { name: "Dashboard KPI", href: "#" },
-      { name: "Laporan Shift", href: "#" },
-    ],
-  },
-  {
-    id: "quality",
-    name: "Quality",
-    items: [
-      { name: "Defect Reporter", href: "#" },
-      { name: "Inspection Log", href: "#" },
-      { name: "Root Cause Analysis", href: "#" },
-    ],
-  },
-  {
-    id: "improvement",
-    name: "Improvement",
-    items: [
-      { name: "IdeaVault Kaizen", href: "#" },
-      { name: "5S Tracker", href: "#" },
-      { name: "Training Record", href: "#" },
-    ],
-  },
-];
+type CategoryGroup = {
+  name: string;
+  items: { name: string; href: string }[];
+};
 
 export default function Footer() {
+  const [groups, setGroups] = useState<CategoryGroup[]>([]);
+
+  useEffect(() => {
+    fetch("/api/apps")
+      .then((r) => r.json())
+      .then((apps: AppItem[]) => {
+        const map = new Map<string, { name: string; href: string }[]>();
+        for (const app of apps) {
+          const cat = app.category || "General";
+          if (!map.has(cat)) map.set(cat, []);
+          map.get(cat)!.push({ name: app.name, href: app.accessLink || "#" });
+        }
+        setGroups(
+          Array.from(map.entries()).map(([name, items]) => ({ name, items }))
+        );
+      });
+  }, []);
+
+  const colClass =
+    groups.length <= 2
+      ? "grid-cols-2"
+      : groups.length === 3
+      ? "grid-cols-2 md:grid-cols-3"
+      : "grid-cols-2 md:grid-cols-4";
+
   return (
     <footer className="relative z-[1] border-t border-foundry-border/40 bg-black">
       {/* Description */}
@@ -54,30 +47,32 @@ export default function Footer() {
       {/* Navigation grid */}
       <div className="mx-auto max-w-7xl px-6 py-10">
         <div className="border-b border-dotted border-foundry-border/40 mb-8" />
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          {navigation.map((section) => (
-            <div key={section.id}>
-              <p
-                className="mb-3 text-molten uppercase"
-                style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", letterSpacing: "0.15em" }}
-              >
-                {section.name}
-              </p>
-              <ul className="flex flex-col space-y-2">
-                {section.items.map((item) => (
-                  <li key={item.name} className="flow-root">
-                    <Link
-                      href={item.href}
-                      className="text-xs text-foundry-muted hover:text-foundry-white transition-colors"
-                    >
-                      {item.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        {groups.length > 0 && (
+          <div className={`grid gap-8 ${colClass}`}>
+            {groups.map((section) => (
+              <div key={section.name}>
+                <p
+                  className="mb-3 text-molten uppercase"
+                  style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "10px", letterSpacing: "0.15em" }}
+                >
+                  {section.name}
+                </p>
+                <ul className="flex flex-col space-y-2">
+                  {section.items.map((item) => (
+                    <li key={item.name} className="flow-root">
+                      <Link
+                        href={item.href}
+                        className="text-xs text-foundry-muted hover:text-foundry-white transition-colors"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="mt-8 border-b border-dotted border-foundry-border/40" />
       </div>
 
