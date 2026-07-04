@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Flame, Star, ExternalLink, Eye,
   MessageSquarePlus, AlertTriangle, CheckCircle2,
+  Copy, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AppItem } from "@/lib/mockData";
@@ -18,6 +19,7 @@ interface Props {
 export default function AppCard({ app }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [opens, setOpens] = useState(app.openCount ?? 0);
+  const [copied, setCopied] = useState(false);
   const Icon = ICON_MAP[app.logoIcon] ?? Flame;
   const isMaintenance = app.status === "MAINTENANCE";
   const pattern = genSeededPattern(parseInt(app.id, 10) * 31, 6);
@@ -26,6 +28,13 @@ export default function AppCard({ app }: Props) {
   function handleOpen() {
     navigator.sendBeacon?.(`/api/apps/${app.id}/open`);
     setOpens((c) => c + 1);
+  }
+
+  async function handleCopyLink() {
+    const url = `${window.location.origin}/go/${app.id}`;
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
   }
 
   return (
@@ -154,6 +163,18 @@ export default function AppCard({ app }: Props) {
               <ExternalLink className="w-3 h-3" />
               {isMaintenance ? "DALAM PERBAIKAN" : "BUKA APLIKASI"}
             </a>
+            <button
+              onClick={handleCopyLink}
+              className="px-2.5 py-2 border border-foundry-border/40 text-foundry-muted hover:border-molten/50 hover:text-molten transition-all duration-200"
+              aria-label={`Salin link untuk ${app.name}`}
+              title="Salin Link"
+            >
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-active" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+            </button>
             <button
               onClick={() => setShowModal(true)}
               className="px-2.5 py-2 border border-foundry-border/40 text-foundry-muted hover:border-molten/50 hover:text-molten transition-all duration-200"
