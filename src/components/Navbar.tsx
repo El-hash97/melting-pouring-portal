@@ -41,6 +41,8 @@ export default function Navbar() {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="relative w-21 h-21 flex items-center justify-center flex-shrink-0">
+        
+                
             <Image
               src="/logo.png"
               alt="Logo"
