@@ -113,8 +113,17 @@ export default function KPIBar() {
 
   return (
     <section className="relative z-[1] bg-foundry-dark border-y border-foundry-border">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+      <div className="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-2 gap-4">
+        {/* Animasi tungku: public/furnace/tungku.html (dibuat oleh scripts/build-furnace.mjs) */}
+        <Card className="overflow-hidden">
+          <iframe
+            src="/furnace/tungku.html"
+            title="Animasi tungku induksi"
+            loading="lazy"
+            className="block w-full aspect-[720/656] border-0"
+          />
+        </Card>
+        <div className="grid grid-cols-2 gap-4">
           <NumCard
             icon={<Grid3X3 className="h-4 w-4 text-foundry-muted" />}
             label="Total Aplikasi"
