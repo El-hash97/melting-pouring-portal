@@ -13,7 +13,15 @@ function swap(from, to) {
 
 // Tombol dihapus, diganti urutan otomatis.
 swap(/<div class="fz-controls">[\s\S]*?<\/div>(?=<\/div><\/figure>)/, "");
-swap(' tabindex="0" aria-label="Tungku induksi. L buka/tutup robuta, C charging, T tapping."', ' aria-label="Tungku induksi: charging, melebur, tapping berulang otomatis."');
+swap(' tabindex="0" aria-label="Tungku induksi. L buka/tutup robuta, C charging, T tapping."', ' aria-label="Medium furnace: charging, heating up, tapping berulang otomatis."');
+swap('data-corner="title">Tungku induksi frekuensi menengah<', 'data-corner="title">Medium furnace<');
+// Caption hanya tiga fase: charging, heating up, tapping.
+swap(/  if \(note\) state = note;[\s\S]*?else state = `melebur[^\n]*\n/, `  if (charge || S.kg < 20) state = "charging";
+  else if (pouring || tilt > 0.5) state = \`tapping \${taps}/2 · miring \${tilt.toFixed(0)}° · ladle \${Math.round(ladleKg)} kg\`;
+  else if (swapClock >= 0) state = \`tapping \${taps}/2 · ganti ladle\`;
+  else if (S.t >= M.tTap - 30) state = \`tapping \${taps}/2\`;
+  else state = "heating up";
+`);
 swap(/\/\/ ---------- Tombol ----------[\s\S]*?(?=\/\/ ---------- Shader ----------)/, `// ---------- Otomatis: charging → melebur → tapping 2x, berulang ----------
 const busy = () => pouring || tilt > 0.5 || charge;
 let wait = 1.5;
